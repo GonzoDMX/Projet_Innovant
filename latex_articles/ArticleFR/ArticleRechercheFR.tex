@@ -1,0 +1,97 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Modèles Dynamiques pour L'Interaction Homme-Robot sur des Plateformes à Ressources Limitées\\
+}
+
+\author{\IEEEauthorblockN{Andrew O'Shei}
+\IEEEauthorblockA{\textit{Département d'informatique} \\
+\textit{Université Paris 8 Vincennes-Saint-Denis}\\
+Saint-Denis, France \\
+andrewoshei@gmail.com}
+\and
+\IEEEauthorblockN{Tuan Hung Nguyen}
+\IEEEauthorblockA{\textit{Département d'informatique} \\
+\textit{Université Paris 8 Vincennes-Saint-Denis}\\
+Saint-Denis, France \\
+ntuanhung.96@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+Cette étude a examiné des modèles dynamiques pour des applications robotiques à faible coût et à ressources limitées. Dans un ensemble d'études de simulation, nous examinons les interactions dyadiques homme-robot en ce qui concerne les tâches coopératives effectuées par une paire robot humain. La configuration pour tester notre modèle est un système à trois caméras monté sur un bras robotisé. Nous utilisons des techniques de computer vision et machine learning pour proposer une solution de capteur basée uniquement sur les caméras à faible coût pour le SLAM, la détection d'objets et la construction de modèles d'interaction avec l'homologue humain du robot. Nous pensons que cette recherche apporte une nouvelle valeur dans l'avancement de l'utilité des applications robotiques grand public.
+\end{abstract}
+
+\begin{IEEEkeywords}
+component, formatting, style, styling, insert
+\end{IEEEkeywords}
+
+\section{Introduction}
+Au cours des dernières décennies, les robots se sont avérés très efficaces dans l'industrie et la fabrication\cite{b1}. Les usines dans lesquelles ces robots opèrent offrent un environnement contrôlé qui réduit le nombre de considérations de conception auxquelles les ingénieurs sont confrontés dans le processus de développement. Dans un environnement d'usine, il n'est probablement pas nécessaire qu'un robot soit capable d'interpréter l'état émotionnel d'un humain par exemple.
+
+Cependant, avec les développements récents des techniques de prototypage rapide, couplés à la baisse constante du coût des composants, il est maintenant devenu financièrement viable de développer des robots pour le marché grand public. L'exemple le plus réussi en est l'aspirateur robot Roomba\cite{b2}.
+
+Bien que le Roomba soit relativement simple dans sa conception, son succès suggère que des marchés se formeront autour de robots effectuant de plus en plus de tâches quotidiennes et la complexité de ces tâches est susceptible d'augmenter avec le temps. Avant que cela ne devienne une réalité, il existe encore plusieurs obstacles à une véritable adoption à grande échelle des solutions robotiques.
+
+Contrairement à leurs homologues industriels, cette classe de robots grand public fonctionnera dans des environnements dynamiques non contrôlés avec des processeurs mobiles à ressources limitées. Cela soulève un certain nombre de préoccupations qui ne se limitent pas à la sécurité. Parmi les principales préoccupations des chercheurs figure la nature de l'interaction entre l'humain et le robot\cite{b3}
+
+Au fur et à mesure que les robots se déplacent dans des environnements tels que la maison, les écoles et les centres commerciaux, de nombreuses applications souhaitées interdiront le comportement de type automate des robots industriels\cite{b4}. Les robots devront observer leur environnement et réagir dynamiquement aux événements imprévisibles. Les robots sont quelque peu uniques à cet égard par rapport aux autres technologies. C'est-à-dire que la plupart des technologies préexistantes servent à augmenter nos capacités alors que de nombreuses applications robotiques cherchent à remplacer carrément le rôle d'un humain dans l'exécution d'une tâche. Cela suggère que ces robots adopteront nécessairement certaines caractéristiques humaines pour réussir leurs tâches respectives.
+
+Cependant, le modèle de contrôle idéal pour les robots grand public reste à déterminer. La réponse ultime sera probablement spécifique à l'application et déterminée par le marché. Pourtant, la recherche universitaire dans ce domaine dictera quelles techniques et méthodes seront explorées par l'industrie.
+
+La recherche académique sur l'interaction homme-robot est le plus souvent divisée entre les interactions dyadiques et non dyadiques\cite{b3}. Nous émettons l'hypothèse qu'un modèle de contrôle vraiment robuste intégrera les leçons tirées des deux approches de recherche. Cela complique la conception de robots grand public, car de nombreux robots utilisés dans la recherche ne sont pas contraints par des limitations de coûts de la même manière.
+
+Une façon de limiter le coût d'une plate-forme robotique est de réduire le nombre de capteurs utilisés dans le modèle de localisation et de mouvement simultanés d'un robot (SLAM). Parmi les capteurs disponibles, la caméra semble être la plus capable de remplacer plusieurs autres types de capteurs. Les caméras sont également particulièrement adaptées aux approches basées sur l'apprentissage automatique pour la détection d'objets, la reconnaissance faciale et l'interpolation d'intention.
+
+Traditionnellement, le traitement d'images est très coûteux en termes de calcul et n'est pas adapté aux plates-formes mobiles. Cependant, cette tendance a changé au cours des dernières années avec la sortie de projets tels que la plate-forme NVidia Jetson et la série Coral.ai de Google de puces de silicium d'apprentissage automatique. Les deux projets susmentionnés offrent des solutions à carte unique rentables pour le traitement d'images et les inférences du machine learning efficace\cite{b5}. Les plates-formes "hobbyist" populaires, telles que le raspberry pi (version 3 et 4), se sont également révélées très performantes dans ce domaine tout en restant relativement peu coûteuses\cite{b6}.
+
+Bien que les caméras offrent d'énormes avantages, elles se font au détriment de la complexité de leur mise en œuvre. Pour qu'un robot soit pleinement conscient de son environnement avec une solution basée uniquement sur une caméra, il faudra soit une caméra avec un angle d'objectif très large (idéalement 360 degrés), soit une configuration multi-caméras. Les caméras grand angle ont tendance à être plus coûteuses et les images qu'elles produisent nécessitent un post-traitement approfondi pour lisser et aplatir les images avant le traitement pour la détection d'image. Les configurations multi-caméras augmentent le nombre de composants et le coût, limitant potentiellement leur avantage par rapport aux autres options de capteur\cite{b7}.
+
+Nous pensons que la configuration multi-caméras est plus susceptible de réussir dans les robots grand public. Le coût des capteurs de caméra de qualité raisonnable (720p ou 1080p) est relativement faible. De plus, les configurations multi-caméras seront plus faciles à adapter pour les robots avec différentes formes. Ainsi, ils ont une probabilité plus élevée d'offrir une solution générale pour les robots dans une gamme d'applications différentes.
+
+
+\section{Test Configuration}
+
+\subsection{Components Used}
+Grab-It Robot Arm by JOY-iT, Raspberry Pi 3 B+, Raspberry Pi Zero 2, 2 Logitech C270 Web Cams, 1 Official Raspberry Pi Camera. PCA9685 PWM Servo Driver
+
+\begin{thebibliography}{00}
+\bibitem{b1} R. Atkinson, ''Robotics and the Future of Production and Work,'' Information Technology and Innovation Foundation, October 2019. https://itif.org/publications/2019/10/15/robotics-and-future-production-and-work
+
+\bibitem{b2} J. Jones, ''Robots at the tipping point: the road to iRobot Roomba,'' IEEE Robotics and Automation Magazine 13, April 2006, pp.76--78.
+
+\bibitem{b3} E. Schneiders, E. Cheon, J. Kjeldskov, M. Rehm and M. B. Skov, ``Non-Dyadic Interaction: A Literature Review of 15 Years of Human-Robot Interaction Conference Publications,'' ACM Trans. Hum.-Robot Interact. 11, 2, Article 13, February 2022. doi: 10.1145/3488242
+
+\bibitem{b4} C. Birmingham, Z. Hu, K. Mahajan, E. Reber and M. J. Mataric, ``Can I Trust You ? A User Study of Robot Mediation of a Support Group,'' 	IEEE International Conference on Robotics and Automation (ICRA 2020), February 2020.
+
+\bibitem{b5} L. Barba-Guaman, J. E. Naranjo and A. Ortiz, ``Deep Learning Framework for Vehicle and Pedestrian Detection in Rural Roads on an Embedded GPU,'' Electronics 9, no. 4:589, March 2020. https://doi.org/10.3390/electronics9040589
+
+\bibitem{b6} K. S. Shilpashree, H. Lokesha and H. Shivkumar, ``Implementation of Image Processing on Raspberry Pi,'' nternational Journal of Advanced Research in Computer and Communication Engineering Vol. 4, Issue 5, May 2015, pp.199--202 doi: 10.17148/IJARCCE.2015.4545
+
+\bibitem{b7} Y. Yang, D. Tang, D. Wang, W. Song, J. Wang and M. Fu, ``Multi-camera visual SLAM for off-road navigation,'' Robotics and Autonomous Systems Vol. 128, June 2020. https://doi.org/10.1016/j.robot.2020.103505
+
+\bibitem{b8} S. Olatunji, A. Potenza, A. Kiselev, T. Oron-Gilad, A. Loutfi and Y. Edan, ``Levels of Automation for a Mobile Robot Teleoperated by a Caregiver,'' ACM Transactions on Human-Robot Interaction, Vol. 11, No. 2, Article 20, February 2022. doi: 10.1145/3507471
+
+\bibitem{b9} K. Jahnavi and P. Sivraj, ``Teaching and learning robotic arm model,'' International Conference on Intelligent Computing, Instrumentation and Control Technologies, July 2017, pp.1570--1575
+
+\bibitem{b10} C. Latella, ''Human Whole-Body Dynamics Estimation for Enhancing Physical Human-Robot Interaction,'' CoRR abs/1912.01136, December 2019. arxiv.org: 1912.01136
+
+\bibitem{b11} N. Wirkuttis and J. Tani J, ''Leading or Following ? Dyadic Robot Imitative Interaction Using the Active Inference Framework,'' IEEE Robotics and Automation Letters, vol. 6, no. 3, pp. 6024-6031, July 2021, doi: 10.1109/LRA.2021.3090015.
+
+\bibitem{b12} S. Schneider, Y. Liu, K. Tomita and T. Kanda, ''Stop Ignoring Me! On Fighting the Trivialization of Social Robots in Public Spaces'', ACM Trans. Human-Robot Interact. 11, 2, Article 11, February 2022.
+
+\end{thebibliography}
+
+\end{document}

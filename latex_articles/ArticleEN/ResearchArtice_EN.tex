@@ -1,0 +1,98 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Dynamic Models for Human-Robot Interaction on Resource Constrained Platforms\\
+}
+
+\author{\IEEEauthorblockN{Andrew O'Shei}
+\IEEEauthorblockA{\textit{Département d'informatique} \\
+\textit{Université Paris 8 Vincennes-Saint-Denis}\\
+Saint-Denis, France \\
+andrewoshei@gmail.com}
+\and
+\IEEEauthorblockN{Tuan Hung Nguyen}
+\IEEEauthorblockA{\textit{Département d'informatique} \\
+\textit{Université Paris 8 Vincennes-Saint-Denis}\\
+Saint-Denis, France \\
+ntuanhung.96@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+This study investigated dynamic models for low-cost resource limited robotics applications. In a set of simulation studies we examine dyadic human-robot interactions as they pertain to cooperative tasks performed by a human robot pair. The setup for testing our model is a three-camera system mounted on a robot arm. We employ computer vision and machine learning techniques to propose a low-cost camera-only based sensor solution for SLAM, object detection and building interaction models with the robot's human counterpart. We believe this research provides novel value in advancing the utility of mass consumer robotics applications.
+\end{abstract}
+
+\begin{IEEEkeywords}
+mass consumer robotics, computer vision
+\end{IEEEkeywords}
+
+\section{Introduction}
+Over the last few decades robots have proven to be very successful in industry and manufacturing\cite{b1}. The factories these robots operate in provide a controlled environment which reduces the number of design considerations engineers face in the development process. In a factory setting it is probably not necessary that a robot is able to interpret a human's emotional state for example.
+
+However, with recent developments in rapid prototyping techniques, coupled with the ever descending cost of components, it has now become financially viable to develop robots for the mass consumer market. The most successful example of this being the Roomba robot vacuum\cite{b2}.
+
+Though the Roomba is relatively simple in its design, its success suggests that markets will form around robots performing more and more everyday tasks and the complexity of these tasks is likely to increase with time. Before this becomes a reality there are still several barriers to true mass scale adoption of robotics solutions.
+
+Unlike their industrial counterparts, this class of consumer-grade robots will be operating in dynamic uncontrolled environments with resource constrained mobile processors. This raises a number of concerns not limited to safety. Among the principle concerns of researchers is the nature of the interaction between the human and the robot\cite{b3}.
+
+As robots move into environments such as the home, schools and shopping centers many desired applications will prohibit the automaton-like behavior of industrial robots\cite{b4}. Robots will be required to observe their environments and react dynamically to unpredictable events. Robots are somewhat unique in this regard when compared to other technologies. That is to say, most preexisting technologies serve to augment our capacities whereas many robotics applications seek to outright replace the role of a human in performing a task. This suggests that these robots will necessarily adopt some human-like characteristics in order to be successful at their respective tasks.
+
+However, the ideal control model for mass consumer robots has yet to be determined. The ultimate answer will likely be application specific and determined by the marketplace. Yet academic research in this domain will dictate what techniques and methods are explored by industry.
+
+Academic research on human-robot interaction is most often split between dyadic and non-dyadic interactions\cite{b3}. We hypothesize that a truly robust control model will integrate lessons learned from both research approaches. This complicates the design of mass consumer robots as many robots used in research are not constrained by cost-limitations in quite the same way.
+
+One way to limit the cost of a robotics platform is to reduce the number of sensors used in a robot's simultaneous localization and movement model (SLAM). Of the sensors available the camera seems to be most capable of replacing multiple other types of sensors. Cameras are also uniquely suited for machine learning-based approaches to object detection, facial recognition and intent interpolation.
+
+Traditionally image processing is very computationally expensive and not conducive with mobile platforms. However, this trend has shifted in the last few years with the release of projects such as the NVidia Jetson platform and Google's Coral.ai series of machine learning silicon chips. Both of the aforementioned projects offer cost-effective single board solutions for efficient image processing and machine learning inference\cite{b5}. Popular hobbbyist platforms, such as the raspberry pi (version 3 and 4), have also proven to be very capable in this domain while remaining relatively inexpensive\cite{b6}.
+
+Though cameras offer tremendous advantages they come at the cost of complexity in their implementation. For a robot to be fully aware of its environment with a camera only-based solution it will require either a camera with a very wide lens angle (ideally 360 degrees) or a multi-cam setup. Wide angle cameras tend to be more costly and the images they produce will require extensive post-processing to smooth and flatten images prior to processing for image detection. Multi-camera setups raise the component count and cost potentially limiting their advantage over other sensor options\cite{b7}.
+
+We believe the multi-camera setup is more likely to succeed in mass consumer robots. The cost of reasonable quality camera sensors (720p or 1080p) is comparatively low. Additionally, multi-camera setups will be easier to adapt for robots with different forms. Thus, they have a higher probability of offering a general solution for robots across a range of different applications.
+
+
+
+\section{Test Configuration}
+
+\subsection{Components Used}
+Grab-It Robot Arm by JOY-iT, Raspberry Pi 3 B+, Raspberry Pi Zero 2, 2 Logitech C270 Web Cams, 1 Official Raspberry Pi Camera. PCA9685 PWM Servo Driver
+
+\begin{thebibliography}{00}
+\bibitem{b1} R. Atkinson, ''Robotics and the Future of Production and Work,'' Information Technology and Innovation Foundation, October 2019. https://itif.org/publications/2019/10/15/robotics-and-future-production-and-work
+
+\bibitem{b2} J. Jones, ''Robots at the tipping point: the road to iRobot Roomba,'' IEEE Robotics and Automation Magazine 13, April 2006, pp.76--78.
+
+\bibitem{b3} E. Schneiders, E. Cheon, J. Kjeldskov, M. Rehm and M. B. Skov, ``Non-Dyadic Interaction: A Literature Review of 15 Years of Human-Robot Interaction Conference Publications,'' ACM Trans. Hum.-Robot Interact. 11, 2, Article 13, February 2022. doi: 10.1145/3488242
+
+\bibitem{b4} C. Birmingham, Z. Hu, K. Mahajan, E. Reber and M. J. Mataric, ``Can I Trust You ? A User Study of Robot Mediation of a Support Group,'' 	IEEE International Conference on Robotics and Automation (ICRA 2020), February 2020.
+
+\bibitem{b5} L. Barba-Guaman, J. E. Naranjo and A. Ortiz, ``Deep Learning Framework for Vehicle and Pedestrian Detection in Rural Roads on an Embedded GPU,'' Electronics 9, no. 4:589, March 2020. https://doi.org/10.3390/electronics9040589
+
+\bibitem{b6} K. S. Shilpashree, H. Lokesha and H. Shivkumar, ``Implementation of Image Processing on Raspberry Pi,'' nternational Journal of Advanced Research in Computer and Communication Engineering Vol. 4, Issue 5, May 2015, pp.199--202 doi: 10.17148/IJARCCE.2015.4545
+
+\bibitem{b7} Y. Yang, D. Tang, D. Wang, W. Song, J. Wang and M. Fu, ``Multi-camera visual SLAM for off-road navigation,'' Robotics and Autonomous Systems Vol. 128, June 2020. https://doi.org/10.1016/j.robot.2020.103505
+
+\bibitem{b8} S. Olatunji, A. Potenza, A. Kiselev, T. Oron-Gilad, A. Loutfi and Y. Edan, ``Levels of Automation for a Mobile Robot Teleoperated by a Caregiver,'' ACM Transactions on Human-Robot Interaction, Vol. 11, No. 2, Article 20, February 2022. doi: 10.1145/3507471
+
+\bibitem{b9} K. Jahnavi and P. Sivraj, ``Teaching and learning robotic arm model,'' International Conference on Intelligent Computing, Instrumentation and Control Technologies, July 2017, pp.1570--1575
+
+\bibitem{b10} C. Latella, ''Human Whole-Body Dynamics Estimation for Enhancing Physical Human-Robot Interaction,'' CoRR abs/1912.01136, December 2019. arxiv.org: 1912.01136
+
+\bibitem{b11} N. Wirkuttis and J. Tani J, ''Leading or Following ? Dyadic Robot Imitative Interaction Using the Active Inference Framework,'' IEEE Robotics and Automation Letters, vol. 6, no. 3, pp. 6024-6031, July 2021, doi: 10.1109/LRA.2021.3090015.
+
+\bibitem{b12} S. Schneider, Y. Liu, K. Tomita and T. Kanda, ''Stop Ignoring Me! On Fighting the Trivialization of Social Robots in Public Spaces'', ACM Trans. Human-Robot Interact. 11, 2, Article 11, February 2022.
+
+\end{thebibliography}
+
+\end{document}
