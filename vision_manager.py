@@ -20,11 +20,12 @@ class Face:
 
 """ Class handles camera, face tracking and distance calculation """
 class FaceTracker:
-    def __init__(self, resolution=(640, 480), display=False):
+    def __init__(self, resolution=(640, 480), display=False, brightness=50):
         self.display = display
         self.resolution = resolution
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.active = True
+        self.brightness = brightness
         # Load classifiers
         self.detect_face = cv2.CascadeClassifier('models/frontalface.xml')
         self.detect_eyes = cv2.CascadeClassifier('models/eye.xml')
@@ -42,7 +43,7 @@ class FaceTracker:
         # Used to calculate rolling average of distance
         self.rolling_buffer = []
         # Setup Camera
-        self.camera = PiVideoStream(resolution=(640, 480))
+        self.camera = PiVideoStream(resolution=resolution)
         self.new_frame = False
 
     ''' Load calibration data from config '''
@@ -128,6 +129,10 @@ class FaceTracker:
         bottom_border = self.face.y + int(self.face.height * 0.6)
         gray_eyes = gray_frame[top_border:bottom_border,
                                self.face.x:self.face.x+self.face.width]
+        #kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+        #gray_eyes = cv2.filter2D(src=gray_eyes, ddepth=-1, kernel=kernel)
+        if self.display:
+            cv2.imshow("eyes", gray_eyes)
         found_eyes = self.detect_eyes.detectMultiScale(gray_eyes, 1.3, 5)
         eyes = []
         for (x, y, w, h) in found_eyes:
@@ -153,10 +158,10 @@ class FaceTracker:
 
     ''' Updates the hand position state, closed = True, open = False '''
     def update_hand_state(self, frame):
-        if self.hand:
-            found_hands = self.detect_palm.detectMultiScale(frame, 1.3, 5)
-        else:
-            found_hands = self.detect_fist.detectMultiScale(frame, 1.3, 5)
+        #if self.hand:
+        #    found_hands = self.detect_palm.detectMultiScale(frame, 1.3, 5)
+        #else:
+        found_hands = self.detect_fist.detectMultiScale(frame, 1.3, 5)
         if len(found_hands) > 0:
             self.hand_count += 1
             if self.hand_count > 3:
@@ -170,11 +175,11 @@ class FaceTracker:
                 self.hand_count -= 1
 
     ''' Generates grayscale of input frame '''
-    def clean_grayscale(self, frame, brightness=15):
+    def clean_grayscale(self, frame):
         grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         grayscale = cv2.equalizeHist(grayscale)
-        mask = (255 - grayscale) < brightness
-        return np.where(mask, 255, grayscale + brightness)
+        mask = (255 - grayscale) < self.brightness
+        return np.where(mask, 255, grayscale + self.brightness)
 
     ''' Get distance from camera to observed object '''
     def distance_from_camera(self, focal_length, real_width, observed_width):
@@ -199,6 +204,7 @@ class FaceTracker:
     def get_center_offset(self):
         off_x = self.face.center_x - (self.resolution[0] * 0.5)
         off_y = self.face.center_y - (self.resolution[1] * 0.5)
+        print("Val Y: y:{}, cy:{}, offy:{}".format(self.face.y, self.face.center_y, off_y))
         return (off_x, off_y)
 
     ''' Get distance to face '''

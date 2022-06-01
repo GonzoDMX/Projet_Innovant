@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
-#from imutils.video.pivideostream import PiVideoStream
-#from picamera.array import PiRGBArray
-#from picamera import PiCamera
+from imutils.video.pivideostream import PiVideoStream
 from vision_helper import euclidean_distance, distance_from_camera, brighten_grayscale
 import imutils
-import math
+import math, time
 import cv2
 import numpy as np
-#import neopixel
-#import board
+import neopixel
+import board
 
 # Set OpenCV Font
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -18,18 +16,18 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 tracking_state = False
 
 # Initialize RGB LED
-#pixels = neopixel.NeoPixel(board.D18, 1)
-#pixels[0] = (0, 255, 0)
+pixels = neopixel.NeoPixel(board.D18, 1)
+pixels[0] = (0, 255, 0)
 
 # Load classifiers
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
 # Setup Camera
-#cam = PiVideoStream(resolution=(640, 480))
-#cam.start()
-
-cam = cv2.VideoCapture(0)
+cam = PiVideoStream(resolution=(800, 600))
+cam.start()
+time.sleep(2)
+#cam = cv2.VideoCapture(0)
 
 print('Enter target eye width (in millimeters):')
 real_width = input()
@@ -41,8 +39,8 @@ target_distance = float(target_distance)
 
 while 1:
     # Get image from camera
-    #image = cam.read()
-    ret, image = cam.read()
+    image = cam.read()
+    #ret, image = cam.read()
 
     # Clean up image for object detection
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -54,7 +52,7 @@ while 1:
 
     if len(faces) > 0:
         tracking_state = True
-        #pixels[0] = (255, 0, 0)
+        pixels[0] = (255, 0, 0)
         for (x,y,w,h) in faces:
             cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
             cx = int(x+w/2)
@@ -84,7 +82,7 @@ while 1:
                 tracking_state = False
     else:
         tracking_state = False
-        #pixels[0] = (0, 255, 0)
+        pixels[0] = (0, 255, 0)
 
     cv2.imshow('img', image)
     k = cv2.waitKey(30) & 0xff
@@ -107,6 +105,6 @@ while 1:
             break
     
 # Clean up processes
-#cam.stop()
-cam.release()
+cam.stop()
+#cam.release()
 cv2.destroyAllWindows()

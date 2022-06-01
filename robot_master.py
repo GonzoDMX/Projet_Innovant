@@ -8,13 +8,16 @@ from vision_manager import FaceTracker
 
 # Initialize RGB LED
 led = neopixel.NeoPixel(board.D18, 1)
-tracker = FaceTracker(display=True)
+tracker = FaceTracker(resolution=(800, 600), display=True, brightness=100)
 kit = ServoKit(channels=16)
 program_running = True
 
 claw = True
 
 hard_limits = [(-15, 15), (0, 25), (15, 30)]
+
+rest_pos = (0, 10, 15)
+shutdown = False
 
 def init_robot_pos(robo):
     start_pos = [160, 100, 35, 180, 10, 90]
@@ -51,27 +54,6 @@ def map_range(value, old_min, old_max, new_min, new_max):
     scale_val = float(value - old_min) / float(old_span)
     return new_min + (scale_val * new_span)
 
-def update_thetas(thetas):
-    # Joint offset relative to kit.servo
-    joint = 5
-    for theta in thetas:
-        angle = math.degrees(theta)
-        if angle > 180:
-            angle = 180
-        if angle < 0:
-            angle = 0
-        if joint==2:
-            if angle > 90:
-                angle = 0
-            else:
-                angle = 90 - angle
-        if joint == 3:
-            angle = map_range(angle, 0, 180, 90, 210)
-            if angle > 180:
-                angle = 180
-        kit.servo[joint].angle = angle
-        joint -= 1
-
 if __name__=="__main__":
     # Initialize RGB LED
     led[0] = (0, 255, 0)
@@ -80,7 +62,7 @@ if __name__=="__main__":
     myRobot = build_robot()
     # Set initial robot position
     init_robot_pos(myRobot)
-    myRobot.set_target(0, -15, 25)
+    myRobot.set_target(0, -10, 25)
     t = 0
     while program_running:
         # If robot is at desired position
@@ -89,35 +71,26 @@ if __name__=="__main__":
             if tracker.tracking and tracker.new_frame:
                 tracker.new_frame = False
                 off_x, off_y = tracker.get_center_offset()
+                pos = myRobot.end_position["target"]
                 if abs(off_x) > 20:
                     if off_x < 0:
-                        myRobot.theta['theta'][0] += math.radians(3)
+                        pos.x += 0.25
                     else:
-                        myRobot.theta['theta'][0] -= math.radians(3)
-                    deg = math.degrees(myRobot.theta['theta'][0])
-                    if deg < 0:
-                        myRobot.theta['theta'][0] = math.radians(0)
-                    if deg > 180:
-                        myRobot.theta['theta'][0] = math.radians(180)
-                    kit.servo[5].angle = math.degrees(myRobot.theta['theta'][0])
-                
+                        pos.x -= 0.25
+
                 if abs(off_y) > 20:
                     if off_y < 0:
-                        myRobot.theta['theta'][3] += math.radians(3)
+                        if pos.y >= -10:
+                            if pos.z < 40:
+                                pos.z += 0.5
+                        else:
+                            pos.y += 0.5
                     else:
-                        myRobot.theta['theta'][3] -= math.radians(3)
-                    deg = math.degrees(myRobot.theta['theta'][3])
-                    deg = map_range(deg, 0, 180, 90, 210)
-                    if deg > 180:
-                        kit.servo[2].angle = 180
-                    else:
-                        kit.servo[2].angle = deg
-                
-                myRobot.update_posture()
-                pos = myRobot.end_position["current"]
+                        pos.z -= 0.5
                 myRobot.set_target(pos.x, pos.y, pos.z)
-                
+                print("Coords: {}, {}, {}".format(pos.x, pos.y, pos.z))
                 # TODO Fix bug in distance movements
+                '''
                 d = tracker.get_distance()
                 if d > 100 and d < 600:
                     if d < 380:
@@ -136,7 +109,7 @@ if __name__=="__main__":
                             pos.z = 30
                     print(pos.x, pos.y, pos.z)
                     myRobot.set_target(pos.x, pos.y, pos.z)
-                
+                '''
             # Update Claw position
             if tracker.hand and not claw:
                 kit.servo[0].angle=160
@@ -153,6 +126,34 @@ if __name__=="__main__":
                 led[0] = (0, 255-blue, blue)
 
         elif not myRobot.on_target():
+            #myRobot.move_to_target()
+            #update_thetas(myRobot.theta['theta'])
             myRobot.move_to_target()
-            update_thetas(myRobot.theta['theta'])
+            joint = 5
+            for theta in myRobot.theta['theta']:
+                angle = math.degrees(theta)
+                print("Origin {}: {}".format(joint, angle))
+                if angle > 180:
+                    angle = 180
+                if angle < 0:
+                    angle = 0
+                if joint==2:
+                    if angle > 90:
+                        angle = 0
+                    else:
+                        angle = 90 - angle
+                if joint == 3:
+                    angle = map_range(angle, 0, 180, 90, 210)
+                    if angle > 180:
+                        angle = 180
+                kit.servo[joint].angle = angle
+                print("Joint {}: {} degees".format(joint, angle))
+                joint -= 1
             time.sleep(0.05)
+        if shutdown and myRobot.on_target():
+            kit.servo[0].angle=160
+            break
+        if not tracker.active:
+            myRobot.set_target(0,-5,15)
+            shutdown = True
+            led[0] = (0, 255, 0)
