@@ -87,10 +87,16 @@ class FaceTracker:
                                   (self.face.x + self.face.width,
                                    self.face.y + self.face.height),
                                   (255,0,0), 2)
-                    cv2.putText(frame,
-                                str(int(self.face.distance))+"mm",
-                                (self.face.x, self.face.y-30),
-                                self.font, 2, (0, 255, 0), 2, cv2.LINE_AA)
+                    if self.face.distance > 0:
+                        cv2.putText(frame,
+                                    str(int(self.face.distance))+"mm",
+                                    (self.face.x, self.face.y+30+self.face.height),
+                                    self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    else:
+                        cv2.putText(frame,
+                                    str(int(self.face.width))+"px",
+                                    (self.face.x, self.face.y+30+self.face.height),
+                                    self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)
             else:
                 self.tracking = False
             self.new_frame = True
@@ -204,9 +210,12 @@ class FaceTracker:
     def get_center_offset(self):
         off_x = self.face.center_x - (self.resolution[0] * 0.5)
         off_y = self.face.center_y - (self.resolution[1] * 0.5)
-        print("Val Y: y:{}, cy:{}, offy:{}".format(self.face.y, self.face.center_y, off_y))
+        #print("Val Y: y:{}, cy:{}, offy:{}".format(self.face.y, self.face.center_y, off_y))
         return (off_x, off_y)
 
     ''' Get distance to face '''
     def get_distance(self):
         return self.face.distance
+    
+    def get_width(self):
+        return self.face.width

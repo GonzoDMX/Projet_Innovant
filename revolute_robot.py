@@ -43,6 +43,22 @@ class RevoluteRobot():
                         'min':   np.array([[]], dtype=np.float),
                         'max':   np.array([[]], dtype=np.float)}
 
+    def get_angles(self):
+        angles = []
+        for theta in self.theta['theta']:
+            angles.append(math.degrees(theta))
+        return angles
+    
+    def set_angles(self, angles):
+        i = 0
+        for a in angles:
+            self.theta['theta'][i] = math.radians(a)
+            i += 1
+        self.update_posture()
+
+    def set_current_as_target(self):
+        self.end_position['target'] = self.end_position['current']
+
     ''' Append a Joint with Link to the robot '''
     def add_joint_link(self, length=0, min_theta=0, max_theta=180, theta=None):
         self.joints = np.append(
